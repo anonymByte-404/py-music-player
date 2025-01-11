@@ -1,2 +1,5 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Ensure Python files always use LF line endings, regardless of platform
+*.py text eol=lf
