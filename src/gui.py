@@ -5,7 +5,7 @@ import os
 def create_gui(root, player):
     """Create the GUI for the music player"""
     root.title("Desktop Music Player")
-    root.geometry("400x300")
+    root.geometry("400x350")
 
     # Playlist Listbox
     track_listbox = tk.Listbox(root, width=40, height=10)
@@ -48,6 +48,31 @@ def create_gui(root, player):
 
     add_button = tk.Button(root, text="Add File", command=add_file, width=15)
     add_button.pack(pady=5)
+
+    # Remove file button
+    def remove_file():
+        selected = track_listbox.curselection()
+        if selected:
+            track_to_remove = track_listbox.get(selected[0])  # Get the file name
+            track_to_remove_path = None
+
+            # Find the file path of the selected song
+            for track in player.playlist:
+                if os.path.basename(track) == track_to_remove:
+                    track_to_remove_path = track
+                    break
+
+            if track_to_remove_path:
+                player.playlist.remove(track_to_remove_path)  # Remove from playlist
+                player.save_playlist()  # Save the updated playlist
+                track_listbox.delete(selected)  # Remove from listbox
+            else:
+                messagebox.showerror("Error", "Could not find the selected song.")
+        else:
+            messagebox.showwarning("No Selection", "Please select a song to remove.")
+
+    remove_button = tk.Button(root, text="Remove", command=remove_file, width=15)
+    remove_button.pack(pady=5)
 
     # Play/Stop button
     def toggle_play():
