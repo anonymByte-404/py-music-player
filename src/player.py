@@ -18,7 +18,7 @@ class Player:
                 data = json.load(file)
                 # Ensure there is a valid 'music_files' list, default to empty if not
                 return data.get("music_files", [])
-        except (FileNotFoundError, json.JSONDecodeError) as e:
+        except (FileNotFoundError, json.JSONDecodeError):
             # If the file is missing or corrupted, initialize a default playlist
             return []
 
