@@ -8,6 +8,7 @@ pygame.mixer.init()
 class Player:
     def __init__(self):
         self.is_playing = False
+        self.is_repeating = False  # Add this flag for repeat functionality
         self.playlist = self.load_playlist()  # Load playlist from JSON
         self.last_folder = self.load_last_folder()  # Load last folder from JSON
 
@@ -18,7 +19,7 @@ class Player:
                 data = json.load(file)
                 # Ensure there is a valid 'music_files' list, default to empty if not
                 return data.get("music_files", [])
-        except (FileNotFoundError, json.JSONDecodeError):
+        except (FileNotFoundError, json.JSONDecodeError) as e:
             # If the file is missing or corrupted, initialize a default playlist
             return []
 
@@ -60,3 +61,16 @@ class Player:
                 pygame.mixer.music.load(self.playlist[0])  # Load the first track
                 pygame.mixer.music.play()
         self.is_playing = not self.is_playing
+
+    def toggle_repeat(self):
+        """Toggle the repeat functionality"""
+        self.is_repeating = not self.is_repeating
+        if self.is_repeating:
+            pygame.mixer.music.set_endevent(pygame.USEREVENT)  # When the song ends, trigger an event
+        else:
+            pygame.mixer.music.set_endevent(0)  # Disable the repeat event
+
+    def handle_repeat(self):
+        """Handle repeat when the song ends"""
+        if self.is_repeating:
+            pygame.mixer.music.play()  # Replay the current song
