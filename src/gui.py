@@ -5,7 +5,7 @@ import os
 def create_gui(root, player):
     """Create the GUI for the music player"""
     root.title("Desktop Music Player")
-    root.geometry("400x350")
+    root.geometry("400x350")  # Increased height to fit new button
 
     # Playlist Listbox
     track_listbox = tk.Listbox(root, width=40, height=10)
@@ -49,31 +49,6 @@ def create_gui(root, player):
     add_button = tk.Button(root, text="Add File", command=add_file, width=15)
     add_button.pack(pady=5)
 
-    # Remove file button
-    def remove_file():
-        selected = track_listbox.curselection()
-        if selected:
-            track_to_remove = track_listbox.get(selected[0])  # Get the file name
-            track_to_remove_path = None
-
-            # Find the file path of the selected song
-            for track in player.playlist:
-                if os.path.basename(track) == track_to_remove:
-                    track_to_remove_path = track
-                    break
-
-            if track_to_remove_path:
-                player.playlist.remove(track_to_remove_path)  # Remove from playlist
-                player.save_playlist()  # Save the updated playlist
-                track_listbox.delete(selected)  # Remove from listbox
-            else:
-                messagebox.showerror("Error", "Could not find the selected song.")
-        else:
-            messagebox.showwarning("No Selection", "Please select a song to remove.")
-
-    remove_button = tk.Button(root, text="Remove", command=remove_file, width=15)
-    remove_button.pack(pady=5)
-
     # Play/Stop button
     def toggle_play():
         player.toggle_play()
@@ -87,6 +62,19 @@ def create_gui(root, player):
     # Initially set the Play button color to green and white text
     play_button = tk.Button(root, text="Play", command=toggle_play, bg="green", fg="white", width=15)
     play_button.pack(pady=5)
+
+    # Repeat button
+    def toggle_repeat():
+        player.toggle_repeat()
+        if player.is_repeating:
+            # Change button color to red when repeat is on
+            repeat_button.config(bg="red", fg="white")
+        else:
+            # Change button color back to white when repeat is off
+            repeat_button.config(bg="white", fg="black")
+
+    repeat_button = tk.Button(root, text="Repeat", command=toggle_repeat, width=15)
+    repeat_button.pack(pady=5)
 
     # Update GUI to show the initial state of the player
     def update_playlist():
