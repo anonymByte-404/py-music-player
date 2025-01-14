@@ -1,11 +1,12 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
+from player import Player
 
 def create_gui(root, player):
     """Create the GUI for the music player"""
     root.title("Desktop Music Player")
-    root.geometry("400x350")  # Increased height to fit new button
+    root.geometry("400x350")
 
     # Playlist Listbox
     track_listbox = tk.Listbox(root, width=40, height=10)
@@ -17,8 +18,6 @@ def create_gui(root, player):
     else:
         for track in player.playlist:
             track_listbox.insert(tk.END, os.path.basename(track))
-
-        # Highlight the first song
         track_listbox.select_set(0)  # Select the first item
 
     # Load folder button
@@ -29,8 +28,6 @@ def create_gui(root, player):
             track_listbox.delete(0, tk.END)  # Clear existing playlist display
             for track in player.playlist:
                 track_listbox.insert(tk.END, os.path.basename(track))
-
-            # Highlight the first song after loading new folder
             track_listbox.select_set(0)  # Select the first item
 
     load_button = tk.Button(root, text="Load Folder", command=load_folder, width=15)
@@ -42,47 +39,48 @@ def create_gui(root, player):
         if file:
             player.add_file(file)
             track_listbox.insert(tk.END, os.path.basename(file))
-
-            # Highlight the newly added song if it is the first one
             track_listbox.select_set(0)  # Select the first item
 
     add_button = tk.Button(root, text="Add File", command=add_file, width=15)
     add_button.pack(pady=5)
 
-    # Play/Stop button
-    def toggle_play():
-        player.toggle_play()
-        if player.is_playing:
-            # Change button color to red when playing
-            play_button.config(text="Stop", bg="red", fg="white")
-        else:
-            # Change button color to green when stopped
-            play_button.config(text="Play", bg="green", fg="white")
-
-    # Initially set the Play button color to green and white text
-    play_button = tk.Button(root, text="Play", command=toggle_play, bg="green", fg="white", width=15)
-    play_button.pack(pady=5)
-
     # Repeat button
     def toggle_repeat():
         player.toggle_repeat()
-        if player.is_repeating:
-            # Change button color to red when repeat is on
+        if player.repeat:
             repeat_button.config(bg="red", fg="white")
         else:
-            # Change button color back to white when repeat is off
             repeat_button.config(bg="white", fg="black")
 
     repeat_button = tk.Button(root, text="Repeat", command=toggle_repeat, width=15)
     repeat_button.pack(pady=5)
 
-    # Update GUI to show the initial state of the player
+    # Play/Stop button
+    def toggle_play():
+        selected_track_index = track_listbox.curselection()
+        track_index = selected_track_index[0] if selected_track_index else 0
+        player.toggle_play(track_index)
+        if player.is_playing:
+            play_button.config(text="Stop", bg="red", fg="white")
+        else:
+            play_button.config(text="Play", bg="green", fg="white")
+
+    play_button = tk.Button(root, text="Play", command=toggle_play, bg="green", fg="white", width=15)
+    play_button.pack(pady=5)
+
+    # Update playlist display
     def update_playlist():
         track_listbox.delete(0, tk.END)
         for track in player.playlist:
             track_listbox.insert(tk.END, os.path.basename(track))
-
-        # Highlight the first song after playlist is updated
         track_listbox.select_set(0)  # Select the first item
 
     update_playlist()
+
+    # Periodic check for repeating songs
+    def check_repeat():
+        if player.is_playing and player.repeat:
+            player.handle_repeat()
+        root.after(100, check_repeat)  # Check every 100ms
+
+    check_repeat()
