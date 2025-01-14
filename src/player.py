@@ -1,6 +1,6 @@
-import pygame
 import json
 import os
+import pygame
 
 # Initialize the pygame mixer for audio playback
 pygame.mixer.init()
@@ -8,69 +8,70 @@ pygame.mixer.init()
 class Player:
     def __init__(self):
         self.is_playing = False
-        self.is_repeating = False  # Add this flag for repeat functionality
-        self.playlist = self.load_playlist()  # Load playlist from JSON
-        self.last_folder = self.load_last_folder()  # Load last folder from JSON
+        self.playlist = []  # List of songs
+        self.repeat = False  # Repeat functionality
+        self.current_track_index = None  # Index of the current track
+        self.load_playlist()  # Load the playlist when the player is initialized
 
     def load_playlist(self):
-        """Load the list of MP3 files from playlist.json"""
-        try:
+        """Load the playlist from a JSON file"""
+        if os.path.exists('playlist.json'):
             with open('playlist.json', 'r') as file:
                 data = json.load(file)
-                # Ensure there is a valid 'music_files' list, default to empty if not
-                return data.get("music_files", [])
-        except (FileNotFoundError, json.JSONDecodeError) as e:
-            # If the file is missing or corrupted, initialize a default playlist
-            return []
-
-    def load_last_folder(self):
-        """Load the last opened folder from playlist.json"""
-        try:
-            with open('playlist.json', 'r') as file:
-                data = json.load(file)
-                return data.get("last_folder", "")
-        except (FileNotFoundError, json.JSONDecodeError):
-            return ""
+                self.playlist = data.get("music_files", [])
+                if self.playlist:
+                    self.current_track_index = 0  # Start with the first track
 
     def save_playlist(self):
-        """Save the current playlist to playlist.json"""
+        """Save the playlist to a JSON file"""
         data = {
-            "music_files": self.playlist,
-            "last_folder": self.last_folder
+            "music_files": self.playlist
         }
         with open('playlist.json', 'w') as file:
             json.dump(data, file, indent=4)
 
     def load_folder(self, folder):
         """Load all MP3 files from a selected folder"""
-        self.last_folder = folder
         self.playlist = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".mp3")]
-        self.save_playlist()
+        self.save_playlist()  # Save playlist after loading folder
+        if self.playlist:
+            self.current_track_index = 0  # Start with the first track
 
     def add_file(self, file):
         """Add a single MP3 file to the playlist"""
         self.playlist.append(file)
-        self.save_playlist()
+        self.save_playlist()  # Save playlist after adding a file
+        if self.current_track_index is None:
+            self.current_track_index = 0  # If no track is playing, start from the first track
 
-    def toggle_play(self):
+    def toggle_play(self, track_index):
         """Start/stop playing the music"""
         if self.is_playing:
             pygame.mixer.music.stop()
+            self.is_playing = False
         else:
-            if self.playlist:
-                pygame.mixer.music.load(self.playlist[0])  # Load the first track
-                pygame.mixer.music.play()
-        self.is_playing = not self.is_playing
+            self.current_track_index = track_index
+            self.play_music(track_index)
 
-    def toggle_repeat(self):
-        """Toggle the repeat functionality"""
-        self.is_repeating = not self.is_repeating
-        if self.is_repeating:
-            pygame.mixer.music.set_endevent(pygame.USEREVENT)  # When the song ends, trigger an event
-        else:
-            pygame.mixer.music.set_endevent(0)  # Disable the repeat event
+    def play_music(self, track_index):
+        """Play the music track"""
+        if self.playlist:
+            pygame.mixer.music.load(self.playlist[track_index])
+            pygame.mixer.music.play()
+            self.is_playing = True
+            self.current_track_index = track_index
+
+            # Set up a callback to check when the song ends
+            pygame.mixer.music.set_endevent(pygame.USEREVENT)
 
     def handle_repeat(self):
-        """Handle repeat when the song ends"""
-        if self.is_repeating:
-            pygame.mixer.music.play()  # Replay the current song
+        """Handle repeat functionality"""
+        if self.is_playing and self.repeat:
+            # Check if the current track has finished playing, if yes, reload and replay the track
+            if not pygame.mixer.music.get_busy():
+                pygame.mixer.music.load(self.playlist[self.current_track_index])
+                pygame.mixer.music.play()
+
+    def toggle_repeat(self):
+        """Toggle repeat functionality"""
+        self.repeat = not self.repeat
