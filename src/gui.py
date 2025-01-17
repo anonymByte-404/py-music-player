@@ -1,7 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import os
-from player import Player
 
 """
 Desktop Music Player - GUI
