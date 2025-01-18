@@ -1,11 +1,10 @@
 [tool.poetry]
 name = "py-music-player"
-version = "0.5.1"
+version = "0.5.2"
 description = "A simple desktop music player with playlist and repeat functionality."
-authors = "anonymByte-404"
+author = "anonymByte-404"
 license = "MIT"
 
 [tool.poetry.dependencies]
 python = "^3.11.9"
 pygame = "^2.6.1"
-tkinter = "*"
