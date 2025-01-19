@@ -2,7 +2,6 @@ import json
 import os
 import pygame
 
-# Initialize the pygame mixer for audio playback
 try:
   pygame.mixer.init()
 except pygame.error as e:
@@ -11,12 +10,10 @@ except pygame.error as e:
 
 
 class Player:
-  """Manage the functionality of the music player."""
-
   PLAYLIST_FILE = "playlist.json"
 
   def __init__(self):
-    """Initialize the player and load the playlist."""
+    """Initialize the player with default settings."""
     self.is_playing = False
     self.playlist = []
     self.repeat = False
@@ -33,13 +30,13 @@ class Player:
           data = json.load(file)
           self.playlist = data.get("music_files", [])
           if self.playlist:
-            self.current_track_index = 0  # Start with the first track
+            self.current_track_index = 0
     except (IOError, json.JSONDecodeError) as e:
       print(f"Error loading playlist: {e}")
       self.playlist = []
 
   def save_playlist(self):
-    """Save the playlist to a JSON file."""
+    """Save the current playlist to a JSON file."""
     try:
       data = {"music_files": self.playlist}
       with open(self.PLAYLIST_FILE, 'w') as file:
@@ -67,7 +64,7 @@ class Player:
       print(f"Error adding file: {e}")
 
   def remove_track(self, track_index):
-    """Remove a track from the playlist."""
+    """Remove a track from the playlist by its index."""
     try:
       if 0 <= track_index < len(self.playlist):
         self.playlist.pop(track_index)
@@ -86,13 +83,13 @@ class Player:
       print(f"Error moving track: {e}")
 
   def update_and_save_playlist(self):
-    """Update the playlist and save it."""
+    """Update the playlist and save it to the file."""
     self.save_playlist()
     if self.current_track_index is None:
-      self.current_track_index = 0  # If no track is playing, start from the first track
+      self.current_track_index = 0
 
   def toggle_play(self, track_index):
-    """Start or stop the music playback."""
+    """Start or stop music playback."""
     if self.is_playing:
       pygame.mixer.music.stop()
       self.is_playing = False
@@ -115,7 +112,7 @@ class Player:
         print(f"Error playing music: {e}")
 
   def handle_repeat(self):
-    """Handle the repeat functionality for the music."""
+    """Handle the repeat functionality when enabled."""
     if self.is_playing and self.repeat:
       if not pygame.mixer.music.get_busy():
         self.play_music(self.current_track_index)
@@ -126,5 +123,5 @@ class Player:
 
   def set_volume(self, volume):
     """Set the playback volume (0.0 to 1.0)."""
-    self.volume = max(0.0, min(1.0, volume))  # Clamp volume between 0.0 and 1.0
+    self.volume = max(0.0, min(1.0, volume))
     pygame.mixer.music.set_volume(self.volume)

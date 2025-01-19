@@ -7,12 +7,10 @@ def create_gui(root, player):
   root.title("Desktop Music Player")
   root.geometry("420x600")
 
-  # Title Label
   title_label = tk.Label(root, text="Desktop Music Player", font=("Helvetica", 16, "bold"), pady=10)
   title_label.pack()
 
-  # Playlist Listbox (Set the width to match the buttons' width)
-  track_listbox = tk.Listbox(root, width=53, height=12, font=("Helvetica", 10))  # Width set to match button width
+  track_listbox = tk.Listbox(root, width=53, height=12, font=("Helvetica", 10))  
   track_listbox.pack(pady=5)
 
   def update_playlist():
@@ -112,16 +110,13 @@ def create_gui(root, player):
     volume = float(value) / 100
     player.set_volume(volume)
 
-  # Volume Label (Centered above the volume slider)
   volume_label = tk.Label(root, text="Volume", font=("Helvetica", 12, "bold"))
   volume_label.pack(pady=(5, 0))
 
-  # Volume Slider (Width set to match button width)
-  volume_slider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=set_volume, length=350)  # Length set to match width
-  volume_slider.set(50)  # Default volume: 50%
+  volume_slider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=set_volume, length=350)
+  volume_slider.set(50)
   volume_slider.pack(pady=(0, 5), padx=5)
 
-  # Row for "Load Folder" and "Add File" buttons (same line)
   button_frame_1 = tk.Frame(root)
   button_frame_1.pack(pady=5)
 
@@ -131,11 +126,9 @@ def create_gui(root, player):
   add_button = tk.Button(button_frame_1, text="Add File", command=add_file, width=18, font=("Helvetica", 12, "bold"), bd=3)
   add_button.grid(row=0, column=1, padx=5)
 
-  # Remove Track Button (Single Button with Combined Width)
   remove_button = tk.Button(root, text="Remove Track", command=remove_selected_track, width=38, font=("Helvetica", 12, "bold"), bd=3)
   remove_button.pack(pady=5)
 
-  # Row for "Move Up" and "Move Down" buttons (same line)
   button_frame_2 = tk.Frame(root)
   button_frame_2.pack(pady=5)
 
@@ -145,15 +138,12 @@ def create_gui(root, player):
   move_down_button = tk.Button(button_frame_2, text="Move Down", command=move_track_down, width=18, font=("Helvetica", 12, "bold"), bd=3)
   move_down_button.grid(row=0, column=1, padx=5)
 
-  # Repeat button (Single Button with Combined Width)
   repeat_button = tk.Button(root, text="Repeat", command=toggle_repeat, width=38, font=("Helvetica", 12, "bold"), bd=3)
   repeat_button.pack(pady=5)
 
-  # Play button (Single Button with Combined Width)
   play_button = tk.Button(root, text="Play", command=toggle_play, bg="green", fg="white", width=38, font=("Helvetica", 12, "bold"), bd=3)
   play_button.pack(pady=5)
 
-  # Initial playlist update
   if not player.playlist:
     messagebox.showwarning("No Playlist", "No music files found! Please load a folder or add files.")
   else:
@@ -163,6 +153,6 @@ def create_gui(root, player):
     """Check if repeat is enabled and handle it."""
     if player.is_playing and player.repeat:
       player.handle_repeat()
-    root.after(100, check_repeat)  # Check every 100ms
+    root.after(100, check_repeat)
 
   check_repeat()
