@@ -8,12 +8,12 @@
 <h2 align="left">Features</h2>
 
 <ul>
-    <li>Play MP3 files</li>
-    <li>Load music files from a selected folder</li>
-    <li>Add individual MP3 files to the playlist</li>
-    <li>Toggle play/pause functionality</li>
-    <li>Playlist is saved and loaded automatically</li>
-    <li>User-friendly GUI built with Tkinter</li>
+    <li>🎵 Play MP3 files</li>
+    <li>📂 Load music files from a selected folder</li>
+    <li>➕ Add individual MP3 files to the playlist</li>
+    <li>⏯️ Toggle play/stop functionality</li>
+    <li>💾 Playlist is saved and loaded automatically</li>
+    <li>🖥️ User-friendly GUI built with Tkinter</li>
 </ul>
 
 <h2 align="center">Installation</h2>
