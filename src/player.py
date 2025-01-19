@@ -3,11 +3,16 @@ import os
 import pygame
 
 # Initialize the pygame mixer for audio playback
-pygame.mixer.init()
+try:
+  pygame.mixer.init()
+except pygame.error as e:
+  print(f"Error initializing pygame mixer: {e}")
+  raise SystemExit("Failed to initialize pygame mixer")
+
 
 class Player:
   """Manage the functionality of the music player."""
-  
+
   PLAYLIST_FILE = "playlist.json"
 
   def __init__(self):
@@ -16,7 +21,9 @@ class Player:
     self.playlist = []
     self.repeat = False
     self.current_track_index = None
+    self.volume = 0.5  # Default volume: 50%
     self.load_playlist()
+    pygame.mixer.music.set_volume(self.volume)
 
   def load_playlist(self):
     """Load the playlist from a JSON file."""
@@ -59,6 +66,25 @@ class Player:
     except Exception as e:
       print(f"Error adding file: {e}")
 
+  def remove_track(self, track_index):
+    """Remove a track from the playlist."""
+    try:
+      if 0 <= track_index < len(self.playlist):
+        self.playlist.pop(track_index)
+        self.update_and_save_playlist()
+    except Exception as e:
+      print(f"Error removing track: {e}")
+
+  def move_track(self, old_index, new_index):
+    """Move a track to a new position in the playlist."""
+    try:
+      if 0 <= old_index < len(self.playlist) and 0 <= new_index < len(self.playlist):
+        track = self.playlist.pop(old_index)
+        self.playlist.insert(new_index, track)
+        self.update_and_save_playlist()
+    except Exception as e:
+      print(f"Error moving track: {e}")
+
   def update_and_save_playlist(self):
     """Update the playlist and save it."""
     self.save_playlist()
@@ -78,11 +104,13 @@ class Player:
     """Play the selected music track."""
     if self.playlist:
       try:
-        pygame.mixer.music.load(self.playlist[track_index])
+        track_path = self.playlist[track_index]
+        pygame.mixer.music.load(track_path)
         pygame.mixer.music.play()
         self.is_playing = True
         self.current_track_index = track_index
         pygame.mixer.music.set_endevent(pygame.USEREVENT)
+        print(f"Playing track: {track_path}")
       except pygame.error as e:
         print(f"Error playing music: {e}")
 
@@ -95,3 +123,8 @@ class Player:
   def toggle_repeat(self):
     """Toggle the repeat functionality on/off."""
     self.repeat = not self.repeat
+
+  def set_volume(self, volume):
+    """Set the playback volume (0.0 to 1.0)."""
+    self.volume = max(0.0, min(1.0, volume))  # Clamp volume between 0.0 and 1.0
+    pygame.mixer.music.set_volume(self.volume)
