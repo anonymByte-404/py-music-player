@@ -1,11 +1,12 @@
+from tkinterdnd2 import TkinterDnD
 import tkinter as tk
-from player import Player
 from gui import create_gui
+from player import Player
 
 def main():
   """Initialize and run the music player application."""
+  root = TkinterDnD.Tk()
   player = Player()
-  root = tk.Tk()
   create_gui(root, player)
   root.mainloop()
 
