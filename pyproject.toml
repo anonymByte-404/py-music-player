@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-music-player"
-version = "1.5.2"
+version = "1.6.2"
 description = "A simple desktop music player with playlist and repeat functionality."
 author = "anonymByte-404"
 license = "MIT"
@@ -8,3 +8,5 @@ license = "MIT"
 [tool.poetry.dependencies]
 python = "^3.11.9"
 pygame = "^2.6.1"
+tkinterdnd2 = "^0.4.2"
+mutagen = "^1.47.0"
