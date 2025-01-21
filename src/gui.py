@@ -52,6 +52,7 @@ def create_gui(root, player):
     if folder:
       player.load_folder(folder)
       update_playlist()
+      print(f"Loaded folder: {folder}")
 
   def add_file():
     """Allow the user to add an individual MP3 file to the playlist."""
@@ -59,6 +60,7 @@ def create_gui(root, player):
     if file:
       player.add_file(file)
       update_playlist()
+      print(f"Added file: {file}")
 
   def remove_selected_track():
     """Remove the selected track from the playlist."""
@@ -69,6 +71,7 @@ def create_gui(root, player):
     track_index = selected_track_index[0]
     player.remove_track(track_index)
     update_playlist()
+    print(f"Removed track at index: {track_index}")
 
   def move_track_up():
     """Move the selected track up in the playlist."""
@@ -80,6 +83,7 @@ def create_gui(root, player):
     if track_index > 0:
       player.move_track(track_index, track_index - 1)
       update_playlist()
+      print(f"Moved track at index {track_index} up")
 
   def move_track_down():
     """Move the selected track down in the playlist."""
@@ -91,11 +95,13 @@ def create_gui(root, player):
     if track_index < len(player.playlist) - 1:
       player.move_track(track_index, track_index + 1)
       update_playlist()
+      print(f"Moved track at index {track_index} down")
 
   def toggle_repeat():
     """Toggle the repeat mode for the music player."""
     player.toggle_repeat()
     update_repeat_button_style()
+    print(f"Repeat mode toggled to: {'on' if player.repeat else 'off'}")
 
   def update_repeat_button_style():
     """Update the appearance of the repeat button based on repeat mode."""
@@ -111,12 +117,17 @@ def create_gui(root, player):
       messagebox.showwarning("No Track Selected", "Please select a track to play.")
       return
     track_index = selected_track_index[0]
+    track_name = os.path.basename(player.playlist[track_index])
     player.toggle_play(track_index)
+    if player.is_playing:
+      print(f"Playing {track_name}")
+    else:
+      print(f"Stopped playing {track_name}")
     update_play_button_style()
     update_playlist()
 
   def update_play_button_style():
-    """Update the appearance of the play button based on the playback state."""
+    """Update the appearance of the play button based on playback state."""
     if player.is_playing:
       play_button.config(text="Stop", bg="red", fg="white")
     else:
@@ -126,21 +137,26 @@ def create_gui(root, player):
     """Set the volume of the player based on the slider value."""
     volume = float(value) / 100
     player.set_volume(volume)
+    print(f"Volume set to: {value}%")
 
   def shuffle_playlist():
     """Shuffle the order of the tracks in the playlist."""
     random.shuffle(player.playlist)
     player.current_track_index = None
     update_playlist()
+    print("Playlist shuffled")
 
   def handle_dragged_files(event):
     """Handle files dragged onto the application window."""
     dragged_paths = root.tk.splitlist(event.data)
     for path in dragged_paths:
+      print(f"Handling path: {path}")
       if os.path.isdir(path):
         player.load_folder(path)
+        print(f"Loaded folder from drag-and-drop: {path}")
       elif os.path.isfile(path) and path.endswith(".mp3"):
         player.add_file(path)
+        print(f"Added file from drag-and-drop: {path}")
       else:
         messagebox.showwarning("Unsupported File", f"Cannot add: {os.path.basename(path)}")
     update_playlist()
@@ -212,3 +228,10 @@ def create_gui(root, player):
     root.after(100, check_repeat)
 
   check_repeat()
+
+  def on_close():
+    print("Closed Desktop Music Player")
+    root.destroy()
+
+  root.protocol("WM_DELETE_WINDOW", on_close)
+  print("Loaded Desktop Music Player")
