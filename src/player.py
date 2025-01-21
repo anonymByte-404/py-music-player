@@ -8,7 +8,6 @@ except pygame.error as e:
   print(f"Error initializing pygame mixer: {e}")
   raise SystemExit("Failed to initialize pygame mixer")
 
-
 class Player:
   PLAYLIST_FILE = "playlist.json"
 
@@ -18,7 +17,7 @@ class Player:
     self.playlist = []
     self.repeat = False
     self.current_track_index = None
-    self.volume = 0.5  # Default volume: 50%
+    self.volume = 0.5
     self.load_playlist()
     pygame.mixer.music.set_volume(self.volume)
 
@@ -110,16 +109,20 @@ class Player:
         print(f"Playing track: {track_path}")
       except pygame.error as e:
         print(f"Error playing music: {e}")
+      except Exception as e:
+        print(f"Unexpected error: {e}")
 
   def handle_repeat(self):
     """Handle the repeat functionality when enabled."""
     if self.is_playing and self.repeat:
       if not pygame.mixer.music.get_busy():
+        print("Song finished, repeating...")
         self.play_music(self.current_track_index)
 
   def toggle_repeat(self):
     """Toggle the repeat functionality on/off."""
     self.repeat = not self.repeat
+    print(f"Repeat mode {'enabled' if self.repeat else 'disabled'}")
 
   def set_volume(self, volume):
     """Set the playback volume (0.0 to 1.0)."""
