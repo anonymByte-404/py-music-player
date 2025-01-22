@@ -2,7 +2,7 @@
 
 <p align="center"><i>A simple desktop music player built with Python, Pygame, and Tkinter, designed to play MP3 files and manage playlists.</i></p>
 
-> **NOTE:**  
+>[!NOTE]
 >This project is still in development. While the core features are functional, there is still plenty of room for improvement and expansion.
 
 <h2 align="left">Features</h2>
