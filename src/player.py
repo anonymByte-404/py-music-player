@@ -1,6 +1,7 @@
 import json
 import os
 import pygame
+from dataclasses import dataclass, field
 
 try:
   pygame.mixer.init()
@@ -8,16 +9,17 @@ except pygame.error as e:
   print(f"Error initializing pygame mixer: {e}")
   raise SystemExit("Failed to initialize pygame mixer")
 
+@dataclass
 class Player:
-  PLAYLIST_FILE = "playlist.json"
+  PLAYLIST_FILE: str = "playlist.json"
+  is_playing: bool = False
+  playlist: list[str] = field(default_factory=list)
+  repeat: bool = False
+  current_track_index: int | None = None
+  volume: float = 0.5
 
-  def __init__(self):
-    """Initialize the player with default settings."""
-    self.is_playing = False
-    self.playlist = []
-    self.repeat = False
-    self.current_track_index = None
-    self.volume = 0.5
+  def __post_init__(self):
+    """Post-initialization to load the playlist and set the volume."""
     self.load_playlist()
     pygame.mixer.music.set_volume(self.volume)
 
@@ -43,7 +45,7 @@ class Player:
     except IOError as e:
       print(f"Error saving playlist: {e}")
 
-  def load_folder(self, folder):
+  def load_folder(self, folder: str):
     """Load MP3 files from a folder into the playlist."""
     try:
       self.playlist = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".mp3")]
@@ -53,7 +55,7 @@ class Player:
     except Exception as e:
       print(f"Error loading folder: {e}")
 
-  def add_file(self, file):
+  def add_file(self, file: str):
     """Add an MP3 file to the playlist."""
     try:
       if file.endswith(".mp3"):
@@ -62,7 +64,7 @@ class Player:
     except Exception as e:
       print(f"Error adding file: {e}")
 
-  def remove_track(self, track_index):
+  def remove_track(self, track_index: int):
     """Remove a track from the playlist by its index."""
     try:
       if 0 <= track_index < len(self.playlist):
@@ -71,7 +73,7 @@ class Player:
     except Exception as e:
       print(f"Error removing track: {e}")
 
-  def move_track(self, old_index, new_index):
+  def move_track(self, old_index: int, new_index: int):
     """Move a track to a new position in the playlist."""
     try:
       if 0 <= old_index < len(self.playlist) and 0 <= new_index < len(self.playlist):
@@ -87,7 +89,7 @@ class Player:
     if self.current_track_index is None:
       self.current_track_index = 0
 
-  def toggle_play(self, track_index):
+  def toggle_play(self, track_index: int):
     """Start or stop music playback."""
     if self.is_playing:
       pygame.mixer.music.stop()
@@ -96,7 +98,7 @@ class Player:
       self.current_track_index = track_index
       self.play_music(track_index)
 
-  def play_music(self, track_index):
+  def play_music(self, track_index: int):
     """Play the selected music track."""
     if self.playlist:
       try:
@@ -124,7 +126,7 @@ class Player:
     self.repeat = not self.repeat
     print(f"Repeat mode {'enabled' if self.repeat else 'disabled'}")
 
-  def set_volume(self, volume):
+  def set_volume(self, volume: float):
     """Set the playback volume (0.0 to 1.0)."""
     self.volume = max(0.0, min(1.0, volume))
     pygame.mixer.music.set_volume(self.volume)
