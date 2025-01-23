@@ -9,6 +9,7 @@ def create_gui(root, player):
   """Create the GUI for the music player."""
   root.title("Desktop Music Player")
   root.geometry("420x640")
+  root.resizable(False, False)
 
   title_label = tk.Label(root, text="Desktop Music Player", font=("Helvetica", 16, "bold"), pady=10)
   title_label.pack()
@@ -105,10 +106,7 @@ def create_gui(root, player):
 
   def update_repeat_button_style():
     """Update the appearance of the repeat button based on repeat mode."""
-    if player.repeat:
-      repeat_button.config(bg="red", fg="white")
-    else:
-      repeat_button.config(bg="white", fg="black")
+    repeat_button.config(bg="red" if player.repeat else "white", fg="white" if player.repeat else "black")
 
   def toggle_play():
     """Toggle between play and stop for the selected track."""
@@ -119,19 +117,13 @@ def create_gui(root, player):
     track_index = selected_track_index[0]
     track_name = os.path.basename(player.playlist[track_index])
     player.toggle_play(track_index)
-    if player.is_playing:
-      print(f"Playing {track_name}")
-    else:
-      print(f"Stopped playing {track_name}")
+    print(f"{'Playing' if player.is_playing else 'Stopped'} {track_name}")
     update_play_button_style()
     update_playlist()
 
   def update_play_button_style():
     """Update the appearance of the play button based on playback state."""
-    if player.is_playing:
-      play_button.config(text="Stop", bg="red", fg="white")
-    else:
-      play_button.config(text="Play", bg="green", fg="white")
+    play_button.config(text="Stop" if player.is_playing else "Play", bg="red" if player.is_playing else "green", fg="white")
 
   def set_volume(value):
     """Set the volume of the player based on the slider value."""
@@ -150,20 +142,16 @@ def create_gui(root, player):
     """Handle files dragged onto the application window."""
     dragged_paths = root.tk.splitlist(event.data)
     for path in dragged_paths:
-      print(f"Handling path: {path}")
       if os.path.isdir(path):
         player.load_folder(path)
-        print(f"Loaded folder from drag-and-drop: {path}")
       elif os.path.isfile(path) and path.endswith(".mp3"):
         player.add_file(path)
-        print(f"Added file from drag-and-drop: {path}")
       else:
         messagebox.showwarning("Unsupported File", f"Cannot add: {os.path.basename(path)}")
     update_playlist()
 
-  # Register drag-and-drop support for MP3 files and folders
   root.drop_target_register(DND_FILES)
-  root.dnd_bind('<<Drop>>', handle_dragged_files)
+  root.dnd_bind("<<Drop>>", handle_dragged_files)
 
   volume_label = tk.Label(root, text="Volume", font=("Helvetica", 12, "bold"))
   volume_label.pack(pady=(5, 0))
