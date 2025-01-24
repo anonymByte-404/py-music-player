@@ -2,11 +2,15 @@ import json
 import os
 import pygame
 from dataclasses import dataclass, field
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
 try:
   pygame.mixer.init()
+  logging.info("Pygame mixer initialized successfully.")
 except pygame.error as e:
-  print(f"Error initializing pygame mixer: {e}")
+  logging.critical(f"Error initializing pygame mixer: {e}")
   raise SystemExit("Failed to initialize pygame mixer")
 
 @dataclass
@@ -21,20 +25,22 @@ class Player:
   def __post_init__(self):
     """Post-initialization to load the playlist and set the volume."""
     self.load_playlist()
-    pygame.mixer.music.set_volume(self.volume)
+    self.set_volume(self.volume)
 
   def load_playlist(self):
     """Load the playlist from a JSON file."""
-    try:
-      if os.path.exists(self.PLAYLIST_FILE):
+    if os.path.exists(self.PLAYLIST_FILE):
+      try:
         with open(self.PLAYLIST_FILE, 'r') as file:
           data = json.load(file)
           self.playlist = data.get("music_files", [])
-          if self.playlist:
-            self.current_track_index = 0
-    except (IOError, json.JSONDecodeError) as e:
-      print(f"Error loading playlist: {e}")
-      self.playlist = []
+          self.current_track_index = 0 if self.playlist else None
+          logging.info("Playlist loaded successfully.")
+      except (IOError, json.JSONDecodeError) as e:
+        logging.error(f"Error loading playlist: {e}")
+        self.playlist = []
+    else:
+      logging.warning("Playlist file not found; starting with an empty playlist.")
 
   def save_playlist(self):
     """Save the current playlist to a JSON file."""
@@ -42,51 +48,54 @@ class Player:
       data = {"music_files": self.playlist}
       with open(self.PLAYLIST_FILE, 'w') as file:
         json.dump(data, file, indent=4)
+      logging.info("Playlist saved successfully.")
     except IOError as e:
-      print(f"Error saving playlist: {e}")
+      logging.error(f"Error saving playlist: {e}")
 
   def load_folder(self, folder: str):
     """Load MP3 files from a folder into the playlist."""
+    if not os.path.exists(folder):
+      logging.error(f"The folder '{folder}' does not exist.")
+      return
     try:
       self.playlist = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".mp3")]
       self.update_and_save_playlist()
-    except FileNotFoundError:
-      print(f"The folder {folder} does not exist.")
+      logging.info(f"Loaded {len(self.playlist)} tracks from folder '{folder}'.")
     except Exception as e:
-      print(f"Error loading folder: {e}")
+      logging.error(f"Error loading folder: {e}")
 
   def add_file(self, file: str):
     """Add an MP3 file to the playlist."""
-    try:
-      if file.endswith(".mp3"):
-        self.playlist.append(file)
-        self.update_and_save_playlist()
-    except Exception as e:
-      print(f"Error adding file: {e}")
+    if not file.endswith(".mp3"):
+      logging.warning(f"File '{file}' is not an MP3 and will not be added.")
+      return
+    self.playlist.append(file)
+    self.update_and_save_playlist()
+    logging.info(f"Added file '{file}' to playlist.")
 
   def remove_track(self, track_index: int):
     """Remove a track from the playlist by its index."""
-    try:
-      if 0 <= track_index < len(self.playlist):
-        self.playlist.pop(track_index)
-        self.update_and_save_playlist()
-    except Exception as e:
-      print(f"Error removing track: {e}")
+    if 0 <= track_index < len(self.playlist):
+      removed = self.playlist.pop(track_index)
+      self.update_and_save_playlist()
+      logging.info(f"Removed track '{removed}' from playlist.")
+    else:
+      logging.error(f"Invalid track index: {track_index}. Cannot remove track.")
 
   def move_track(self, old_index: int, new_index: int):
     """Move a track to a new position in the playlist."""
-    try:
-      if 0 <= old_index < len(self.playlist) and 0 <= new_index < len(self.playlist):
-        track = self.playlist.pop(old_index)
-        self.playlist.insert(new_index, track)
-        self.update_and_save_playlist()
-    except Exception as e:
-      print(f"Error moving track: {e}")
+    if not (0 <= old_index < len(self.playlist)) or not (0 <= new_index < len(self.playlist)):
+      logging.error(f"Invalid indices for moving track: {old_index} -> {new_index}.")
+      return
+    track = self.playlist.pop(old_index)
+    self.playlist.insert(new_index, track)
+    self.update_and_save_playlist()
+    logging.info(f"Moved track '{track}' from position {old_index} to {new_index}.")
 
   def update_and_save_playlist(self):
     """Update the playlist and save it to the file."""
     self.save_playlist()
-    if self.current_track_index is None:
+    if self.current_track_index is None and self.playlist:
       self.current_track_index = 0
 
   def toggle_play(self, track_index: int):
@@ -94,39 +103,35 @@ class Player:
     if self.is_playing:
       pygame.mixer.music.stop()
       self.is_playing = False
+      logging.info("Playback stopped.")
     else:
-      self.current_track_index = track_index
       self.play_music(track_index)
 
   def play_music(self, track_index: int):
     """Play the selected music track."""
-    if self.playlist:
-      try:
-        track_path = self.playlist[track_index]
-        pygame.mixer.music.load(track_path)
-        pygame.mixer.music.play()
-        self.is_playing = True
-        self.current_track_index = track_index
-        pygame.mixer.music.set_endevent(pygame.USEREVENT)
-        print(f"Playing track: {track_path}")
-      except pygame.error as e:
-        print(f"Error playing music: {e}")
-      except Exception as e:
-        print(f"Unexpected error: {e}")
-
-  def handle_repeat(self):
-    """Handle the repeat functionality when enabled."""
-    if self.is_playing and self.repeat:
-      if not pygame.mixer.music.get_busy():
-        print("Song finished, repeating...")
-        self.play_music(self.current_track_index)
+    if not self.playlist:
+      logging.warning("No tracks available in the playlist to play.")
+      return
+    try:
+      track_path = self.playlist[track_index]
+      pygame.mixer.music.load(track_path)
+      pygame.mixer.music.play()
+      self.is_playing = True
+      self.current_track_index = track_index
+      pygame.mixer.music.set_endevent(pygame.USEREVENT)
+      logging.info(f"Now playing: {track_path}")
+    except pygame.error as e:
+      logging.error(f"Error playing music: {e}")
+    except Exception as e:
+      logging.error(f"Unexpected error: {e}")
 
   def toggle_repeat(self):
     """Toggle the repeat functionality on/off."""
     self.repeat = not self.repeat
-    print(f"Repeat mode {'enabled' if self.repeat else 'disabled'}")
+    logging.info(f"Repeat mode {'enabled' if self.repeat else 'disabled'}.")
 
   def set_volume(self, volume: float):
     """Set the playback volume (0.0 to 1.0)."""
     self.volume = max(0.0, min(1.0, volume))
     pygame.mixer.music.set_volume(self.volume)
+    logging.info(f"Volume set to {self.volume:.2f}.")
