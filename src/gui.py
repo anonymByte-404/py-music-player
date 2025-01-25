@@ -65,30 +65,30 @@ def create_buttons(root, player, track_listbox):
   button_frame_1.pack(pady=5)
 
   tk.Button(button_frame_1, text="Load Folder", command=lambda: load_folder(player, track_listbox), width=18,
-            font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
   tk.Button(button_frame_1, text="Add File", command=lambda: add_file(player, track_listbox), width=18,
-            font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
 
   tk.Button(root, text="Remove Track", command=lambda: remove_selected_track(player, track_listbox), width=38,
-            font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
+    font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
 
   button_frame_2 = tk.Frame(root)
   button_frame_2.pack(pady=5)
 
   tk.Button(button_frame_2, text="Move Up", command=lambda: move_track(player, track_listbox, up=True), width=18,
-            font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
   tk.Button(button_frame_2, text="Move Down", command=lambda: move_track(player, track_listbox, up=False), width=18,
-            font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
 
   tk.Button(root, text="Shuffle", command=lambda: shuffle_playlist(player, track_listbox), width=38,
-            font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
+    font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
 
   repeat_button = tk.Button(root, text="Repeat", command=lambda: toggle_repeat(player, repeat_button), width=38,
-                            font=("Helvetica", 12, "bold"), bd=3)
+    font=("Helvetica", 12, "bold"), bd=3)
   repeat_button.pack(pady=5)
 
   play_button = tk.Button(root, text="Play", command=lambda: toggle_play(player, track_listbox, play_button), bg="green",
-                          fg="white", width=38, font=("Helvetica", 12, "bold"), bd=3)
+    fg="white", width=38, font=("Helvetica", 12, "bold"), bd=3)
   play_button.pack(pady=5)
 
 def create_status_bar(root, player):
@@ -117,15 +117,21 @@ def load_folder(player, track_listbox):
   """Load all tracks from a folder into the playlist."""
   folder = filedialog.askdirectory()
   if folder:
-    player.load_folder(folder)
-    update_playlist_display(player, track_listbox)
+    try:
+      player.load_folder(folder)
+      update_playlist_display(player, track_listbox)
+    except Exception as e:
+      messagebox.showerror("Error", f"Failed to load folder: {e}")
 
 def add_file(player, track_listbox):
   """Add a single file to the playlist."""
   file = filedialog.askopenfilename(filetypes=[("MP3 Files", "*.mp3")])
   if file:
-    player.add_file(file)
-    update_playlist_display(player, track_listbox)
+    try:
+      player.add_file(file)
+      update_playlist_display(player, track_listbox)
+    except Exception as e:
+      messagebox.showerror("Error", f"Failed to add file: {e}")
 
 def remove_selected_track(player, track_listbox):
   """Remove the selected track from the playlist."""
@@ -133,8 +139,11 @@ def remove_selected_track(player, track_listbox):
   if not selected:
     messagebox.showwarning("No Track Selected", "Please select a track to remove.")
     return
-  player.remove_track(selected[0])
-  update_playlist_display(player, track_listbox)
+  try:
+    player.remove_track(selected[0])
+    update_playlist_display(player, track_listbox)
+  except Exception as e:
+    messagebox.showerror("Error", f"Failed to remove track: {e}")
 
 def move_track(player, track_listbox, up):
   """Move a selected track up or down in the playlist."""
@@ -145,13 +154,19 @@ def move_track(player, track_listbox, up):
   index = selected[0]
   new_index = index - 1 if up else index + 1
   if 0 <= new_index < len(player.playlist):
-    player.move_track(index, new_index)
-    update_playlist_display(player, track_listbox)
+    try:
+      player.move_track(index, new_index)
+      update_playlist_display(player, track_listbox)
+    except Exception as e:
+      messagebox.showerror("Error", f"Failed to move track: {e}")
 
 def shuffle_playlist(player, track_listbox):
   """Shuffle the current playlist."""
-  random.shuffle(player.playlist)
-  update_playlist_display(player, track_listbox)
+  try:
+    random.shuffle(player.playlist)
+    update_playlist_display(player, track_listbox)
+  except Exception as e:
+    messagebox.showerror("Error", f"Failed to shuffle playlist: {e}")
 
 def toggle_repeat(player, button):
   """Toggle the repeat mode for the player."""
@@ -165,13 +180,19 @@ def toggle_play(player, track_listbox, button):
     messagebox.showwarning("No Track Selected", "Please select a track to play.")
     return
   index = selected[0]
-  player.toggle_play(index)
-  button.config(text="Stop" if player.is_playing else "Play", bg="red" if player.is_playing else "green", fg="white")
-  update_playlist_display(player, track_listbox)
+  try:
+    player.toggle_play(index)
+    button.config(text="Stop" if player.is_playing else "Play", bg="red" if player.is_playing else "green", fg="white")
+    update_playlist_display(player, track_listbox)
+  except Exception as e:
+    messagebox.showerror("Error", f"Failed to toggle play: {e}")
 
 def set_volume(player, value):
   """Set the volume level of the player."""
-  player.set_volume(float(value) / 100)
+  try:
+    player.set_volume(float(value) / 100)
+  except Exception as e:
+    messagebox.showerror("Error", f"Failed to set volume: {e}")
 
 def update_playlist_display(player, track_listbox):
   """Update the playlist display to reflect the current state."""
@@ -182,8 +203,9 @@ def update_playlist_display(player, track_listbox):
       duration = int(audio.info.length)
       mins, secs = divmod(duration, 60)
       duration_str = f"{mins}:{secs:02d}"
-    except:
+    except Exception as e:
       duration_str = "Unknown"
+      print(f"Error reading track duration: {e}")
     track_name = os.path.basename(track)
     display_name = f"> {track_name} ({duration_str})" if index == player.current_track_index else f"{track_name} ({duration_str})"
     track_listbox.insert(tk.END, display_name)
