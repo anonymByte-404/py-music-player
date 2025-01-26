@@ -4,6 +4,7 @@ from tkinter import filedialog, messagebox
 from mutagen.mp3 import MP3
 import random
 import os
+import logging
 
 def create_gui(root, player):
   """Initialize the GUI for the Desktop Music Player."""
@@ -163,6 +164,7 @@ def move_track(player, track_listbox, up):
 def shuffle_playlist(player, track_listbox):
   """Shuffle the current playlist."""
   try:
+    logging.info("Shuffle playlist")
     random.shuffle(player.playlist)
     update_playlist_display(player, track_listbox)
   except Exception as e:
