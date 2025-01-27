@@ -3,6 +3,7 @@ import os
 import pygame
 from dataclasses import dataclass, field
 import logging
+import time
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 
@@ -41,6 +42,7 @@ class Player:
         self.playlist = []
     else:
       logging.warning("Playlist file not found; starting with an empty playlist.")
+      self.save_playlist()
 
   def save_playlist(self):
     """Save the current playlist to a JSON file."""
@@ -95,7 +97,9 @@ class Player:
   def update_and_save_playlist(self):
     """Update the playlist and save it to the file."""
     self.save_playlist()
-    if self.current_track_index is None and self.playlist:
+    if self.current_track_index is not None and self.current_track_index >= len(self.playlist):
+      self.current_track_index = len(self.playlist) - 1
+    elif self.current_track_index is None and self.playlist:
       self.current_track_index = 0
 
   def toggle_play(self, track_index: int):
@@ -104,13 +108,15 @@ class Player:
       pygame.mixer.music.stop()
       self.is_playing = False
       logging.info("Playback stopped.")
-    else:
+    elif 0 <= track_index < len(self.playlist):
       self.play_music(track_index)
+    else:
+      logging.warning(f"Invalid track index: {track_index}. Cannot toggle playback.")
 
   def play_music(self, track_index: int):
     """Play the selected music track."""
-    if not self.playlist:
-      logging.warning("No tracks available in the playlist to play.")
+    if track_index < 0 or track_index >= len(self.playlist):
+      logging.error(f"Track index {track_index} is out of bounds.")
       return
     try:
       track_path = self.playlist[track_index]
@@ -118,7 +124,6 @@ class Player:
       pygame.mixer.music.play()
       self.is_playing = True
       self.current_track_index = track_index
-      pygame.mixer.music.set_endevent(pygame.USEREVENT)
       logging.info(f"Now playing: {track_path}")
     except pygame.error as e:
       logging.error(f"Error playing music: {e}")
@@ -135,3 +140,29 @@ class Player:
     self.volume = max(0.0, min(1.0, volume))
     pygame.mixer.music.set_volume(self.volume)
     logging.info(f"Volume set to {self.volume:.2f}.")
+
+  def handle_music_end(self):
+    """Handle music end event (auto-repeat or next track)."""
+    if self.repeat and self.current_track_index is not None:
+      # If repeat is enabled, play the same track again
+      self.play_music(self.current_track_index)
+    elif self.current_track_index + 1 < len(self.playlist):
+      # If repeat is disabled and there is a next track, play it
+      self.play_music(self.current_track_index + 1)
+    else:
+      # If no more tracks, stop the music and reset
+      self.is_playing = False
+      self.current_track_index = None
+      logging.info("Playlist playback completed.")
+
+  def event_loop(self):
+    """Event loop to handle pygame events."""
+    running = True
+    while running:
+      for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+          running = False
+        # Handle music end event here
+        if not pygame.mixer.music.get_busy():
+          self.handle_music_end()
+      time.sleep(0.1)  # Small delay to reduce CPU usage
