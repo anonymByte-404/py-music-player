@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-music-player"
-version = "1.8.6"
+version = "1.8.7"
 description = "A simple desktop music player with playlist and repeat functionality."
 author = "anonymByte-404"
 license = "MIT"
