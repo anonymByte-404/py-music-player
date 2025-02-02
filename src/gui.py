@@ -30,22 +30,23 @@ def configure_root_window(root):
   root.title("Desktop Music Player")
   root.geometry("420x640")
   root.resizable(False, False)
+  root.config(bg="#262323")
 
 def create_title_label(root):
   """Create the title label for the application."""
-  title_label = tk.Label(root, text="Desktop Music Player", font=("Helvetica", 16, "bold"), pady=10)
+  title_label = tk.Label(root, text="Desktop Music Player", font=("Helvetica", 16, "bold"), pady=10, bg="#262323", fg="#DFD7D7")
   title_label.pack()
   return title_label
 
 def create_playlist_section(root, player):
   """Create the playlist display area with scrollbar."""
-  playlist_frame = tk.Frame(root)
+  playlist_frame = tk.Frame(root, bg="#262323")
   playlist_frame.pack(pady=5)
 
-  track_listbox = tk.Listbox(playlist_frame, width=53, height=12, font=("Helvetica", 10))
+  track_listbox = tk.Listbox(playlist_frame, width=53, height=12, font=("Helvetica", 10), bg="#262323", fg="#DFD7D7", selectbackground="#a7a7a7", selectforeground="#262323")
   track_listbox.grid(row=0, column=0)
 
-  scrollbar = tk.Scrollbar(playlist_frame, orient=tk.VERTICAL, command=track_listbox.yview)
+  scrollbar = tk.Scrollbar(playlist_frame, orient=tk.VERTICAL, command=track_listbox.yview, bg="#423F3F")
   scrollbar.grid(row=0, column=1, sticky="ns")
   track_listbox.config(yscrollcommand=scrollbar.set)
   
@@ -53,39 +54,39 @@ def create_playlist_section(root, player):
 
 def create_volume_controls(root, player):
   """Create the volume slider controls."""
-  volume_label = tk.Label(root, text="Volume", font=("Helvetica", 12, "bold"))
+  volume_label = tk.Label(root, text="Volume", font=("Helvetica", 12, "bold"), bg="#262323", fg="#DFD7D7")
   volume_label.pack(pady=(5, 0))
 
-  volume_slider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=lambda value: set_volume(player, value), length=350)
+  volume_slider = tk.Scale(root, from_=0, to=100, orient=tk.HORIZONTAL, command=lambda value: set_volume(player, value), length=350, bg="#262323", fg="#DFD7D7", sliderlength=20)
   volume_slider.set(50)
   volume_slider.pack(pady=(0, 5), padx=5)
 
 def create_buttons(root, player, track_listbox):
   """Create the control buttons."""
-  button_frame_1 = tk.Frame(root)
+  button_frame_1 = tk.Frame(root, bg="#262323")
   button_frame_1.pack(pady=5)
 
   tk.Button(button_frame_1, text="Load Folder", command=lambda: load_folder(player, track_listbox), width=18,
-    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").grid(row=0, column=0, padx=5)
   tk.Button(button_frame_1, text="Add File", command=lambda: add_file(player, track_listbox), width=18,
-    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").grid(row=0, column=1, padx=5)
 
   tk.Button(root, text="Remove Track", command=lambda: remove_selected_track(player, track_listbox), width=38,
-    font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").pack(pady=5)
 
-  button_frame_2 = tk.Frame(root)
+  button_frame_2 = tk.Frame(root, bg="#262323")
   button_frame_2.pack(pady=5)
 
   tk.Button(button_frame_2, text="Move Up", command=lambda: move_track(player, track_listbox, up=True), width=18,
-    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=0, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").grid(row=0, column=0, padx=5)
   tk.Button(button_frame_2, text="Move Down", command=lambda: move_track(player, track_listbox, up=False), width=18,
-    font=("Helvetica", 12, "bold"), bd=3).grid(row=0, column=1, padx=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").grid(row=0, column=1, padx=5)
 
   tk.Button(root, text="Shuffle", command=lambda: shuffle_playlist(player, track_listbox), width=38,
-    font=("Helvetica", 12, "bold"), bd=3).pack(pady=5)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7").pack(pady=5)
 
   repeat_button = tk.Button(root, text="Repeat", command=lambda: toggle_repeat(player, repeat_button), width=38,
-    font=("Helvetica", 12, "bold"), bd=3)
+    font=("Helvetica", 12, "bold"), bd=3, bg="#262323", fg="#DFD7D7")
   repeat_button.pack(pady=5)
 
   play_button = tk.Button(root, text="Play", command=lambda: toggle_play(player, track_listbox, play_button), bg="green",
@@ -94,7 +95,7 @@ def create_buttons(root, player, track_listbox):
 
 def create_status_bar(root, player):
   """Create the status bar to display current track info."""
-  status_bar = tk.Label(root, text="No track playing", bd=1, relief=tk.SUNKEN, anchor=tk.W, font=("Helvetica", 10, "italic"))
+  status_bar = tk.Label(root, text="No track playing", bd=1, relief=tk.SUNKEN, anchor=tk.W, font=("Helvetica", 10, "italic"), bg="#262323", fg="#DFD7D7")
   status_bar.pack(side=tk.BOTTOM, fill=tk.X)
   return status_bar
 
@@ -173,7 +174,7 @@ def shuffle_playlist(player, track_listbox):
 def toggle_repeat(player, button):
   """Toggle the repeat mode for the player."""
   player.toggle_repeat()
-  button.config(bg="red" if player.repeat else "white", fg="white" if player.repeat else "black")
+  button.config(bg="red" if player.repeat else "#262323", fg="white" if player.repeat else "#DFD7D7")
 
 def toggle_play(player, track_listbox, button):
   """Play or stop the currently selected track."""
