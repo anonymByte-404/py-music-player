@@ -5,7 +5,7 @@
     <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
   </a>
   <a href="https://github.com/anonymByte-404/py-music-player">
-    <img src="https://img.shields.io/badge/version-1.8.7-blue.svg" alt="Version">
+    <img src="https://img.shields.io/badge/version-1.8.8-blue.svg" alt="Version">
   </a>
   <a href="https://pypi.org/project/your-package-name/">
     <img src="https://img.shields.io/pypi/pyversions/your-package-name.svg" alt="Python Version">
