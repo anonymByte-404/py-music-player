@@ -1,27 +1,13 @@
 <h1 align="center">py-music-player</h1>
 
 <p align="center">
-  <a href="LICENSE">
-    <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
-  </a>
-  <a href="https://github.com/anonymByte-404/py-music-player">
-    <img src="https://img.shields.io/badge/version-1.8.8-blue.svg" alt="Version">
-  </a>
-  <a href="https://pypi.org/project/your-package-name/">
-    <img src="https://img.shields.io/pypi/pyversions/your-package-name.svg" alt="Python Version">
-  </a>
-  <a href="https://img.shields.io/badge/Python-3.11.9-blue.svg">
-    <img src="https://img.shields.io/badge/Python-3.11.9-blue.svg" alt="Python Version">
-  </a>
-  <a href="https://img.shields.io/badge/Pygame-2.6.1-blue.svg">
-    <img src="https://img.shields.io/badge/Pygame-2.6.1-blue.svg" alt="Pygame Version">
-  </a>
-  <a href="https://img.shields.io/badge/Tkinterdnd2-0.4.2-blue.svg">
-    <img src="https://img.shields.io/badge/Tkinterdnd2-0.4.2-blue.svg" alt="Tkinterdnd2 Version">
-  </a>
-  <a href="https://img.shields.io/badge/Mutagen-1.47.0-blue.svg">
-    <img src="https://img.shields.io/badge/Mutagen-1.47.0-blue.svg" alt="Mutagen Version">
-  </a>
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
+  <img src="https://img.shields.io/badge/version-1.8.8-blue.svg" alt="Version">
+  <img src="https://img.shields.io/pypi/pyversions/your-package-name.svg" alt="Python Version">
+  <img src="https://img.shields.io/badge/Python-3.11.9-blue.svg" alt="Python Version">
+  <img src="https://img.shields.io/badge/Pygame-2.6.1-blue.svg" alt="Pygame Version">
+  <img src="https://img.shields.io/badge/Tkinterdnd2-0.4.2-blue.svg" alt="Tkinterdnd2 Version">
+  <img src="https://img.shields.io/badge/Mutagen-1.47.0-blue.svg" alt="Mutagen Version">
 </p>
 
 <p align="center"><i>A simple desktop music player built with Python, Pygame, and Tkinter, designed to play MP3 files and manage playlists.</i></p>
