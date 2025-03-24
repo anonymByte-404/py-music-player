@@ -69,20 +69,26 @@ class Player:
             logging.error(f"The folder '{folder}' does not exist.")
             return
         try:
-            self.playlist = [os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".mp3")]
-            self.update_and_save_playlist()
-            logging.info(f"Loaded {len(self.playlist)} tracks from folder '{folder}'.")
+            new_tracks = [
+                os.path.join(folder, f) for f in os.listdir(folder) if f.endswith(".mp3")
+            ]
+            if new_tracks:
+                self.playlist.extend(new_tracks)
+                self.update_and_save_playlist()
+                logging.info(f"Loaded {len(new_tracks)} tracks from folder '{folder}'.")
+            else:
+                logging.warning(f"No MP3 files found in folder '{folder}'.")
         except Exception as e:
             logging.error(f"Error loading folder: {e}")
 
     def add_file(self, file: str):
         """Add an MP3 file to the playlist."""
-        if not file.endswith(".mp3"):
+        if file.endswith(".mp3"):
+            self.playlist.append(file)
+            self.update_and_save_playlist()
+            logging.info(f"Added file '{file}' to playlist.")
+        else:
             logging.warning(f"File '{file}' is not an MP3 and will not be added.")
-            return
-        self.playlist.append(file)
-        self.update_and_save_playlist()
-        logging.info(f"Added file '{file}' to playlist.")
 
     def remove_track(self, track_index: int):
         """Remove a track from the playlist by its index."""
@@ -95,17 +101,21 @@ class Player:
 
     def move_track(self, old_index: int, new_index: int):
         """Move a track to a new position in the playlist."""
-        if not (0 <= old_index < len(self.playlist)) or not (0 <= new_index < len(self.playlist)):
+        if 0 <= old_index < len(self.playlist) and 0 <= new_index < len(self.playlist):
+            track = self.playlist.pop(old_index)
+            self.playlist.insert(new_index, track)
+            self.update_and_save_playlist()
+            logging.info(f"Moved track '{track}' from position {old_index} to {new_index}.")
+        else:
             logging.error(f"Invalid indices for moving track: {old_index} -> {new_index}.")
-            return
-        track = self.playlist.pop(old_index)
-        self.playlist.insert(new_index, track)
-        self.update_and_save_playlist()
-        logging.info(f"Moved track '{track}' from position {old_index} to {new_index}.")
 
     def update_and_save_playlist(self):
         """Update the playlist and save it to the file."""
         self.save_playlist()
+        self._update_current_track_index()
+
+    def _update_current_track_index(self):
+        """Helper function to update current track index when playlist changes."""
         if self.current_track_index is not None and self.current_track_index >= len(self.playlist):
             self.current_track_index = len(self.playlist) - 1
         elif self.current_track_index is None and self.playlist:
