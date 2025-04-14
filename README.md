@@ -2,7 +2,7 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/License-MIT-green.svg" alt="MIT License">
-  <img src="https://img.shields.io/badge/version-1.9.8-blue.svg" alt="Version">
+  <img src="https://img.shields.io/badge/version-1.10.8-blue.svg" alt="Version">
   <img src="https://img.shields.io/pypi/pyversions/your-package-name.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/Python-3.11.9-blue.svg" alt="Python Version">
   <img src="https://img.shields.io/badge/Pygame-2.6.1-blue.svg" alt="Pygame Version">
